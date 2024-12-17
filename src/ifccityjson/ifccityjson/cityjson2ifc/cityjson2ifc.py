@@ -377,7 +377,7 @@ class Cityjson2ifc:
             # CREATE ENTITY
             surface_geometry = self.geometry.create_IFC_surface(self.IFC_model, geometry, surface_id)
             if surface_geometry:
-                IFC_shape_representation = self.create_IFC_shape_representation(surface_geometry, "brep", lod)
+                IFC_shape_representation = self.create_IFC_shape_representation(surface_geometry, "SurfaceModel", lod)
 
                 child_data["Representation"] = self.IFC_model.create_entity(
                     "IfcProductDefinitionShape", Representations=[IFC_shape_representation]
