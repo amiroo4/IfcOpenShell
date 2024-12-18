@@ -52,7 +52,7 @@ class GeometryIO:
     # https://www.cityjson.org/specs/1.0.3/#geometry-objects
     def create_IFC_geometry(self, IFC_model, geometry):
         IFC_Geometry = None
-        geometry_type = "brep"
+        geometry_type = "SurfaceModel"
         if geometry.type in ["MultiPoint"]:
             IFC_geometry = self.create_IFC_cartesian_point_list3D(IFC_model, geometry)
             geometry_type = "PointCloud"
