@@ -17,6 +17,7 @@
 # along with ifccityjson.  If not, see <http://www.gnu.org/licenses/>.
 
 import warnings
+from collections.abc import Iterable
 
 
 class GeometryIO:
