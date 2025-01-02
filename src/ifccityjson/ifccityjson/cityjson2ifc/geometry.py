@@ -28,10 +28,6 @@ class GeometryIO:
     def set_scale(self, scale):
         self.scale = scale
 
-    def build_vertices(self, IFC_model, vertices):
-        for vertex in vertices:
-            self.build_vertex(IFC_model, vertex)
-
     def build_vertex(self, IFC_model, vertex):
         if self.scale:
             IFC_vertex = [float(xyz) * coord_scale for xyz, coord_scale in zip(vertex, self.scale)]
