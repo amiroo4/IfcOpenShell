@@ -133,7 +133,8 @@ class GeometryIO:
             face_ids = geometry.surfaces[surface_id]["surface_idx"]
             if face_ids is None:
                 return  # there is no geometry
-            faces = [geometry.boundaries[fid[0]] for fid in face_ids]
+            for fid in face_ids:
+                faces.append(geometry.boundaries[fid[0]][fid[1]])
         else:
             faces = geometry.boundaries
 
