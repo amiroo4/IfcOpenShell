@@ -39,10 +39,14 @@ class GeometryIO:
         return IFC_cartesian_point
 
     def get_vertex(self, IFC_model, vertex):
-        if tuple(vertex) in self.vertices:
-            return self.vertices[tuple(vertex)]
+        if not isinstance(vertex[0], Iterable):
+                return self.build_vertex(IFC_model, vertex)           
         else:
-            return self.build_vertex(IFC_model, vertex)
+            for v in vertex:
+                if tuple(v) in self.vertices:
+                    return self.vertices[tuple(v)]
+                else:
+                    return self.build_vertex(IFC_model, v)
 
     # See for CityJSON geometries:
     # https://www.cityjson.org/dev/geom-arrays/
