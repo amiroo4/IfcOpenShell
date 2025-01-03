@@ -322,9 +322,10 @@ class Cityjson2ifc:
                     IFC_shape_representations.append(IFC_shape_representation)
 
                 if len(IFC_shape_representations) > 0:
-                    data["Representation"] = self.IFC_model.create_entity(
-                        "IfcProductDefinitionShape", Representations=IFC_shape_representations
-                    )
+                    IFC_child_class = "IfcBuildingElementProxy"
+                    child_data = {"GlobalId": ifcopenshell.guid.new(), "Name": IFC_child_class}
+                    child_data["Representation"] = self.IFC_model.create_entity("IfcProductDefinitionShape", Representations=IFC_shape_representations)
+                    IFC_semantic_surface_children.append(self.IFC_model.create_entity(IFC_child_class, **child_data))
                 data["GlobalId"] = ifcopenshell.guid.new()
                 data["Name"] = IFC_name
 
