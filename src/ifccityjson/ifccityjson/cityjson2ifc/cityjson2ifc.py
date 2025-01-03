@@ -21,7 +21,7 @@ import os
 import ifcopenshell
 import ifcopenshell.api
 import ifcopenshell.guid
-from datetime import datetime
+from datetime import datetime,timezone
 
 from .geometry import GeometryIO
 from . import __version__
@@ -165,7 +165,7 @@ class Cityjson2ifc:
             self.IFC_model.create_entity("IfcMapConversion", **self.properties["local_translation"])
 
     def create_new_file(self):
-        self.IFC_model = ifcopenshell.api.run("project.create_file")
+        self.IFC_model = self.create_file()
         self.IFC_project = ifcopenshell.api.run(
             "root.create_entity",
             self.IFC_model,
@@ -420,3 +420,22 @@ class Cityjson2ifc:
 
         pset = ifcopenshell.api.run("pset.add_pset", self.IFC_model, product=IFC_entity, name="CityJSON_attributes")
         ifcopenshell.api.run("pset.edit_pset", self.IFC_model, pset=pset, properties=CJ_attributes)
+
+    def create_file(self) -> ifcopenshell.file:
+        version: str = "IFC4"
+        settings = {"version": version}
+
+        file = ifcopenshell.file(schema=settings["version"])
+        file.wrapped_data.header.file_name.name = "\\"+ self.properties["file_destination"]+ ".ifc"
+        file.wrapped_data.header.file_name.time_stamp = (
+                datetime.utcnow().replace(tzinfo=timezone.utc).astimezone().replace(microsecond=0).isoformat()
+            )
+        file.wrapped_data.header.file_name.preprocessor_version = "IfcOpenShell {}".format(ifcopenshell.version)
+        file.wrapped_data.header.file_name.originating_system = "IfcOpenShell {}".format(ifcopenshell.version)
+        file.wrapped_data.header.file_name.authorization = "3dgeoinfo/3DGI"
+        file.wrapped_data.header.file_description.description = ("ViewDefinition[DesignTransferView]",)
+        file.wrapped_data.header.file_name.organization = "H"
+        file.wrapped_data.header.file_name.author = "A"
+
+
+        return file
