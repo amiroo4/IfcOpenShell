@@ -277,6 +277,17 @@ class Cityjson2ifc:
     def create_IFC_classes(self):
         parents_children_relations = {"IfcSite": {"Parent": self.IFC_site, "Children": []}}
         geometries = {}
+        existing_placements = self.IFC_model.by_type("IfcAxis2Placement3D")
+        target_placement = None
+        for placement in existing_placements:
+            if placement.Location.Coordinates == [0.0, 0.0, 0.0]:
+                target_placement = placement
+                break
+        if not target_placement:
+            placement_origin = self.IFC_model.create_entity("IfcCartesianPoint", [0.0, 0.0, 0.0])  # Example origin
+            target_placement = self.IFC_model.create_entity("IfcAxis2Placement3D", Location=placement_origin)
+        local_placement = self.IFC_model.create_entity("IfcLocalPlacement", PlacementRelTo=None, RelativePlacement=target_placement)
+
         for obj_id, obj in self.city_model.get_cityobjects().items():
             # CityJSON type to class
             try:
@@ -310,7 +321,7 @@ class Cityjson2ifc:
                 IFC_geometry, shape_representation_type = None, None
 
                 if geometry and geometry.surfaces:
-                    IFC_semantic_surface_children.extend(self.create_IFC_semantic_surface_children(geometry, lod))
+                    IFC_semantic_surface_children.extend(self.create_IFC_semantic_surface_children(geometry, lod, local_placement))
                 elif geometry:
                     IFC_geometry, shape_representation_type = self.geometry.create_IFC_geometry(
                         self.IFC_model, geometry
@@ -325,6 +336,7 @@ class Cityjson2ifc:
                     IFC_child_class = "IfcBuildingElementProxy"
                     child_data = {"GlobalId": ifcopenshell.guid.new(), "Name": IFC_child_class}
                     child_data["Representation"] = self.IFC_model.create_entity("IfcProductDefinitionShape", Representations=IFC_shape_representations)
+                    child_data["ObjectPlacement"] = local_placement
                     IFC_semantic_surface_children.append(self.IFC_model.create_entity(IFC_child_class, **child_data))
                 data["GlobalId"] = ifcopenshell.guid.new()
                 data["Name"] = IFC_name
@@ -384,7 +396,7 @@ class Cityjson2ifc:
                     },
                 )
 
-    def create_IFC_semantic_surface_children(self, geometry, lod):
+    def create_IFC_semantic_surface_children(self, geometry, lod, local_placement):
         IFC_semantic_surface_children = []
         for surface_id in geometry.surfaces:
             IFC_child_class = JSON_TO_IFC[geometry.surfaces[surface_id]["type"]][0]
@@ -398,6 +410,7 @@ class Cityjson2ifc:
                 child_data["Representation"] = self.IFC_model.create_entity(
                     "IfcProductDefinitionShape", Representations=[IFC_shape_representation]
                 )
+                child_data["ObjectPlacement"] = local_placement
             IFC_semantic_surface_children.append(self.IFC_model.create_entity(IFC_child_class, **child_data))
 
         return IFC_semantic_surface_children
