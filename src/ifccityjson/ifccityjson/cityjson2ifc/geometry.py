@@ -40,7 +40,10 @@ class GeometryIO:
 
     def get_vertex(self, IFC_model, vertex):
         if not isinstance(vertex[0], Iterable):
-                return self.build_vertex(IFC_model, vertex)           
+                if tuple(vertex) in self.vertices:
+                    return self.vertices[tuple(vertex)]
+                else:
+                    return self.build_vertex(IFC_model, vertex)           
         else:
             for v in vertex:
                 if tuple(v) in self.vertices:
