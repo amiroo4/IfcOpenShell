@@ -21,18 +21,22 @@ from collections.abc import Iterable
 
 
 class GeometryIO:
-    def __init__(self, scale=None):
+    def __init__(self, scale=None, height=None):
         self.vertices = {}
         self.scale = scale
+        self.height = height
 
-    def set_scale(self, scale):
+    def set_scale(self, scale, height):
         self.scale = scale
+        self.height = height
 
     def build_vertex(self, IFC_model, vertex):
         if self.scale:
             IFC_vertex = [float(xyz) * coord_scale for xyz, coord_scale in zip(vertex, self.scale)]
+            IFC_vertex[2] = IFC_vertex[2] + float(self.height)
         else:
             IFC_vertex = [float(xyz) for xyz in vertex]
+            IFC_vertex[2] = IFC_vertex[2] + float(self.height)
 
         IFC_cartesian_point = IFC_model.create_entity("IfcCartesianPoint", IFC_vertex)
         self.vertices[tuple(vertex)] = IFC_cartesian_point

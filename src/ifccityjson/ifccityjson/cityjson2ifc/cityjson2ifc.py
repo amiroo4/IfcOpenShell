@@ -129,7 +129,7 @@ class Cityjson2ifc:
         self.city_model = city_model
         self.create_new_file()
         self.create_metadata()
-        self.geometry.set_scale(self.properties["local_scale"])
+        self.geometry.set_scale(self.properties["local_scale"],self.properties["verticalT"])
         # self.geometry.build_vertices(self.IFC_model,
         #                             coords=city_model.j["vertices"],
         #                             scale=self.properties["local_scale"])
@@ -147,11 +147,12 @@ class Cityjson2ifc:
         self.properties["local_translation"] = {}
         self.properties["local_scale"] = None
         self.properties["local_scale"] = self.city_model.transform["scale"]
+        self.properties["verticalT"] = self.city_model.transform["translate"][2]
         local_translation = self.city_model.transform["translate"]
         self.properties["local_translation"] = {
             "Eastings": local_translation[0],
             "Northings": local_translation[1],
-            "OrthogonalHeight": local_translation[2],
+            "OrthogonalHeight": 0,
         }
 
         epsg = self.city_model.get_epsg()
